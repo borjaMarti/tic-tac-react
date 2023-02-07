@@ -20,6 +20,14 @@ export default function Game() {
     let description;
     move > 0 ? description = `Go to move #${move}` : description = 'Go to game start';
 
+    if (history.length === move + 1) {
+      return (
+      <li key={move}>
+        You are on move #{move + 1}
+      </li>
+      );
+    }
+
     return (
       <li key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
