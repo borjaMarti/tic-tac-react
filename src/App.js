@@ -59,6 +59,25 @@ function Board({ xIsNext, squares, onPlay }) {
   let status;
   winner ? status = `Winner: ${winner}` : status = `Next player: ${xIsNext ? "X" : "O"}`;
 
+  let boardy = [];
+
+  for (let i = 0; i <= 6; i += 3) {
+    let squary = [];
+    
+    for (let j = 1; j <= 3; j++) {
+      squary.push(<Square key={(j + i) - 1} value={squares[(j + i) - 1]} onSquareClick={() => handleClick((j + i) - 1)} />);
+    }
+
+    boardy.push(<div key={i} className="board-row">{squary}</div>);
+  }
+
+  return (
+    <>
+      <div className="status">{status}</div>
+      {boardy}
+    </>
+  );
+
   return (
     <>
       <div className="status">{status}</div>
