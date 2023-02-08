@@ -5,6 +5,8 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  // 3 - Add a toggle button that lets you sort the moves in either ascending or descending order
+  const [listDirection, setListDirection] = useState(false);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -15,25 +17,10 @@ export default function Game() {
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
-
-  const moves = history.map((squares, move) => {
-    let description;
-    move > 0 ? description = `Go to move #${move}` : description = 'Go to game start';
-
-    if (history.length === move + 1) {
-      return (
-      <li key={move}>
-        You are on move #{move + 1}
-      </li>
-      );
-    }
-
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
-      </li>
-    );
-  });
+  // 3
+  function reverseList() {
+    setListDirection(!listDirection);
+  }
 
   return (
     <div className="game">
@@ -41,7 +28,10 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        <button onClick={reverseList}>
+          Reverse order
+        </button>
+        <MoveList history={history} onClick={jumpTo} direction={listDirection}/>
       </div>
     </div>
   );
@@ -58,9 +48,10 @@ function Board({ xIsNext, squares, onPlay }) {
   const winner = calculateWinner(squares);
   let status;
   winner ? status = `Winner: ${winner}` : status = `Next player: ${xIsNext ? "X" : "O"}`;
-
+    
+  // 2 - Rewrite Board to use two loops to make the squares instead of hardcoding them
   let boardy = [];
-
+  
   for (let i = 0; i <= 6; i += 3) {
     let squary = [];
     
@@ -77,27 +68,6 @@ function Board({ xIsNext, squares, onPlay }) {
       {boardy}
     </>
   );
-
-  return (
-    <>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
-    </>
-  );
 }
 
 function Square({ value, onSquareClick }) {
@@ -105,6 +75,35 @@ function Square({ value, onSquareClick }) {
     <button className="square" onClick={onSquareClick}>
       {value}
     </button>
+  );
+}
+
+// 3
+function MoveList({ history, onClick, direction }) {
+  let moves = history.map((squares, move) => {
+    let description;
+    move > 0 ? description = `Go to move #${move}` : description = 'Go to game start';
+    // 1 - For the current move only, show “You are at move #…” instead of a button
+    if (history.length === move + 1) {
+      return (
+      <li key={move}>
+        You are on move #{move + 1}
+      </li>
+      );
+    }
+    return (
+      <li key={move}>
+        <button onClick={() => onClick(move)}>{description}</button>
+      </li>
+    );
+  });
+  
+  if (direction) moves.reverse();
+
+  return (
+    <>
+      <ol>{moves}</ol>
+    </>
   );
 }
 
